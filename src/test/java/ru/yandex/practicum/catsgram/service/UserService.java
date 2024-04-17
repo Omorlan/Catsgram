@@ -14,12 +14,21 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class UserService {
     private final Map<Long, User> users = new HashMap<>();
 
-    @GetMapping
+
+    public Optional<User> findUserById(Long id) {
+        if (users.containsKey(id)) {
+            return Optional.of(users.get(id));
+        } else {
+            return Optional.empty();
+        }
+    }
+
     public Collection<User> findAll() {
         return users.values();
     }
@@ -32,7 +41,7 @@ public class UserService {
                 .orElse(0);
         return ++currentMaxId;
     }
-    @PostMapping
+
     public User create(@RequestBody User user) {
         // проверяем выполнение необходимых условий
         if (user.getUsername() == null || user.getUsername().isBlank()) {
@@ -48,7 +57,7 @@ public class UserService {
         users.put(user.getId(),user);
         return user;
     }
-    @PutMapping
+
     public User update(@RequestBody User newUser) {
         if (newUser.getId() == null) {
             throw new ConditionsNotMetException("Id должен быть указан");
